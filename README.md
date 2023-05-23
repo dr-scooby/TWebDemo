@@ -1,8 +1,15 @@
 # TWebDemo
-Inventory DB prod
+Inventory DB.
+
 A database management application to keep track of laptops on hand. How many laptops of certian models, like HP, Lenovo, Dell.
 How many are working, not working.
 Which laptops are assigned to users.
+Search by serial or enter a partial serial number.
+Search by Model.
+List all models on hand.
+List all serial numbers of laptops on hand that are un-assigned to a user.
+Kept track of shipments to Oregon, USA. These were laptops that were sent using a shipment memo and FedEx tracking number.
+The shipment memo also listed the serials of the laptops, and can easily search for the serial in the memos DB.
 The application uses CSS, HTML as the front end, and little of javascript.
 The backend uses Java, JSP/Servlets and the MVC model.
 Eclipse was used as the IDE to code.
