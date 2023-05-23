@@ -93,6 +93,9 @@ public class ControllerServlet extends HttpServlet {
 			case "/updateMemo":
 				updateMemo(request, response);
 				break;
+			case "/deletememo":
+				deleteMemo(request, response);
+				break;
 			case "/History":
 				History(request, response);
 				break;
@@ -736,11 +739,28 @@ public class ControllerServlet extends HttpServlet {
 	
 	// get a listing of memos
 	private void memo(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+		// get the HttpSession
+		HttpSession session = request.getSession();
+
+				
+		// check if user session is null, re-direct to login page
+		if(session.getAttribute("user") != null){
+			
+			ArrayList<Memo> listing = dbmodel.getMemos();
+			request.setAttribute("memolisting", listing);
+			RequestDispatcher dispatch = request.getRequestDispatcher("memos.jsp");
+			dispatch.forward(request, response);
+			return;
+			
+		}else {
+			String link = "memo";
+			request.setAttribute("link", link);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
+			dispatcher.forward(request, response);
+			response.sendRedirect("login.jsp");
+			return;
+		}
 		
-		ArrayList<Memo> listing = dbmodel.getMemos();
-		request.setAttribute("memolisting", listing);
-		RequestDispatcher dispatch = request.getRequestDispatcher("memos.jsp");
-		dispatch.forward(request, response);
 	}
 	
 	// create new memo
@@ -886,6 +906,75 @@ public class ControllerServlet extends HttpServlet {
 				RequestDispatcher dispatch = request.getRequestDispatcher("success.jsp");
 				dispatch.forward(request, response);
 				return;
+			}
+		}
+	}
+	
+	// delete memo
+	private void deleteMemo(HttpServletRequest request, HttpServletResponse response) {
+		String memoid = request.getParameter("memoID");
+		System.out.println("MemoID to DELETE: " + memoid);
+		if(memoid.isEmpty()) {
+			
+		}else {
+			try {
+				if(dbmodel.deleteMemoID(memoid)) {
+					System.out.println("Success deleting MemoID: " + memoid);
+					request.setAttribute("message", "Success deleting MemoID: " + memoid);
+					RequestDispatcher dis = request.getRequestDispatcher("success.jsp");
+					try {
+						dis.forward(request, response);
+					} catch (ServletException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else {
+					System.out.println("Failed to delete MemoID: " + memoid);
+					request.setAttribute("message", "Failed to delete MemoID: " + memoid);
+					RequestDispatcher dis = request.getRequestDispatcher("success.jsp");
+					try {
+						dis.forward(request, response);
+					} catch (ServletException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} catch (SQLException  e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				request.setAttribute("err", e.getMessage());
+				RequestDispatcher dis = request.getRequestDispatcher("Error.jsp");
+				try {
+					dis.forward(request, response);
+				} catch (ServletException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					request.setAttribute("exception", e.getMessage());
+					dis = request.getRequestDispatcher("Error.jsp");
+					try {
+						dis.forward(request, response);
+					} catch (ServletException | IOException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					request.setAttribute("exception", e.getMessage());
+					dis = request.getRequestDispatcher("Error.jsp");
+					try {
+						dis.forward(request, response);
+					} catch (ServletException | IOException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+				}
 			}
 		}
 	}
